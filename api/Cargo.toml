@@ -1,0 +1,8 @@
+[package]
+name = "codedefender-api"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+codedefender-config = { path = "../config" }
+reqwest = { version = "0.12.22", features = ["blocking"] }

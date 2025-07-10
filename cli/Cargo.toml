@@ -1,0 +1,14 @@
+[package]
+name = "codedefender-cli"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = { version = "1.0.219", features = ["derive"] }
+serde_yaml = "0.9.34"
+clap = { version = "4", features = ["derive"] }
+env_logger = "0.11.8"
+log = "0.4.27"
+codedefender-config = { path = "../config" }
+codedefender-api = { path = "../api" }
+reqwest = { version = "0.12.22", features = ["blocking"] }
