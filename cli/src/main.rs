@@ -1,7 +1,11 @@
 use clap::Parser;
 use codedefender_config::{YAML_CONFIG_VERSION, YamlConfig};
 use std::{fs, io::Error, path::PathBuf};
-use codedefender_api::
+
+mod api {
+    pub use codedefender_api::analyze_program as analyze;
+    pub use codedefender_api::upload_file as upload;
+}
 
 const CLI_DOWNLOAD_LINK: &str = "https://github.com/codedefender-io/cli/releases";
 
@@ -38,7 +42,31 @@ fn main() -> Result<(), Error> {
         ));
     }
 
-    let client = reqwest::Client::new();
+    let client = reqwest::blocking::Client::new();
     let binary_file_bytes = fs::read(config.input_file)?;
+
+    // Upload binary and optionally PDB file
+    let binary_file_uuid = api::upload(binary_file_bytes, &client, &config.api_key)
+        .expect("Failed to upload binary file!");
+
+    let pdb_file_uuid = match config.pdb_file {
+        Some(path) => {
+            let pdb_file_bytes = fs::read(path)?;
+            Some(
+                api::upload(pdb_file_bytes, &client, &config.api_key)
+                    .expect("Failed to upload PDB file!"),
+            )
+        }
+        _ => None,
+    };
+
+    match api::analyze(binary_file_uuid, pdb_file_uuid, &client, &config.api_key) {
+        Ok(analysis) => {
+            
+        }
+        Err(e) => {
+            panic!("Analysis failed: {}", e.to_string());
+        }
+    }
     Ok(())
 }

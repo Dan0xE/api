@@ -57,8 +57,8 @@ pub fn upload_file(
 /// Returns a `reqwest::Error` if the network request fails or if the server returns a non-success status.
 /// Panics if JSON deserialization fails (consider replacing `unwrap()` with proper error handling).
 pub fn analyze_program(
-    file_id: &str,
-    pdb_file_id: Option<&str>,
+    file_id: String,
+    pdb_file_id: Option<String>,
     client: &Client,
     api_key: &str,
 ) -> Result<AnalysisResult, reqwest::Error> {
@@ -85,7 +85,6 @@ pub fn analyze_program(
 pub fn defend(uuid: String, config: CDConfig, client: &Client, api_key: &str) -> String {
     todo!()
 }
-
 
 pub fn download(uuid: String, client: &Client, api_key: &str) -> DownloadStatus {
     todo!()
