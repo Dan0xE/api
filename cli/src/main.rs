@@ -1,6 +1,7 @@
 use clap::Parser;
 use codedefender_config::{YAML_CONFIG_VERSION, YamlConfig};
-use std::{fs, path::PathBuf};
+use std::{fs, io::Error, path::PathBuf};
+use codedefender_api::
 
 const CLI_DOWNLOAD_LINK: &str = "https://github.com/codedefender-io/cli/releases";
 
@@ -17,7 +18,7 @@ struct Cli {
     log_level: log::LevelFilter,
 }
 
-fn main() {
+fn main() -> Result<(), Error> {
     let cli = Cli::parse();
     env_logger::builder().filter_level(cli.log_level).init();
     let config_contents = fs::read_to_string(&cli.config).expect("Failed to read the config file");
@@ -31,8 +32,13 @@ fn main() {
             YAML_CONFIG_VERSION
         );
         log::error!("Latest here: {CLI_DOWNLOAD_LINK}");
-        return;
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            "Invalid config version!",
+        ));
     }
 
     let client = reqwest::Client::new();
+    let binary_file_bytes = fs::read(config.input_file)?;
+    Ok(())
 }

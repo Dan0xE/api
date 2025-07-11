@@ -261,7 +261,7 @@ pub struct AnalysisResult {
 /// Symbol representation used in YAML: either name or RVA.
 #[derive(Debug, Serialize, Deserialize)]
 pub enum YamlSymbol {
-    /// Symbol name.
+    /// Symbol name
     Name(String),
     /// Symbol RVA.
     Rva(u64),
@@ -294,5 +294,5 @@ pub struct YamlConfig {
     /// Global module-wide obfuscation settings.
     pub module_settings: CDModuleSettings,
     /// Obfuscation profiles to apply.
-    pub profiles: Vec<CDProfile>,
+    pub profiles: Vec<YamlProfile>,
 }

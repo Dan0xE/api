@@ -82,15 +82,11 @@ pub fn analyze_program(
     Ok(analysis_result)
 }
 
-/// Start the process of defending the file, this will return an execution UUID
-/// which can be used to poll and download the result.
-pub fn defend(file: String, config: CDConfig, client: &Client, api_key: &str) -> String {
+pub fn defend(uuid: String, config: CDConfig, client: &Client, api_key: &str) -> String {
     todo!()
 }
 
-/// Attempt to download the obfuscated binary, will return
-/// an error only if obfuscation failed, will return None if its still being
-/// processed by the server.
+
 pub fn download(uuid: String, client: &Client, api_key: &str) -> DownloadStatus {
     todo!()
 }
