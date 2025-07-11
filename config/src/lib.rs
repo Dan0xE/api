@@ -172,6 +172,16 @@ pub struct AnalysisReject {
     pub reason: String,
 }
 
+/// Small wrapper container for source level macros. name contains the profile name
+/// and rvas for that profile.
+#[derive(serde::Deserialize, serde::Serialize, Clone)]
+pub struct AnalysisMacroProfile {
+    /// Profile name
+    pub name: String,
+    /// List of rvas to be associated with the profile
+    pub rvas: Vec<u64>,
+}
+
 /// This structure gets sent to the browser as json.
 #[derive(serde::Deserialize, serde::Serialize, Clone)]
 pub struct AnalysisResult {
@@ -181,6 +191,10 @@ pub struct AnalysisResult {
     pub functions: Vec<AnalysisFunction>,
     /// All of the rejected functions and why they were rejected.
     pub rejects: Vec<AnalysisReject>,
+    /// If someone is using source macros, this will contain
+    /// the profiles and functions to put into that profile. Empty
+    /// if no source macros are used.
+    pub macros: Vec<AnalysisMacroProfile>,
 }
 
 /// Abstraction for symbols to specify them via name or RVA.
