@@ -1,71 +1,115 @@
+//! `codedefender-config` provides the Rust data structures used for serializing and deserializing
+//! CodeDefender YAML configuration files and analysis results. These structures are used by both
+//! the CodeDefender CLI and its backend services.
+//!
+//! This crate is intended to be consumed by tools that integrate with or generate CodeDefender config files.
+
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
+/// Current supported YAML config version.
 pub const YAML_CONFIG_VERSION: &str = "1.0.0";
 
+/// Available SIMD extension types used by mutation engines.
 #[derive(Debug, Serialize, Deserialize)]
 pub enum MutationEngineExtension {
+    /// Generic (no special SIMD usage)
     Generic = 0,
+    /// SSE-enabled
     SSE = 1,
 }
 
+/// Supported PE environments.
 #[derive(Debug, Clone, Copy, Eq, PartialEq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum PeEnvironment {
+    /// User-mode PE (exe, dll)
     UserMode,
+    /// Kernel-mode PE (sys)
     KernelMode,
+    /// UEFI firmware image
     UEFI,
 }
 
+/// Configuration settings for lifting x86 instructions into IR.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LifterSettings {
+    /// Whether to lift calls into IR.
     pub lift_calls: bool,
+    /// Max stack copy size in bytes when lifting.
     pub max_stack_copy_size: u32,
+    /// Fallback: split on calls if lifting fails.
     pub split_on_calls_fallback: bool,
 }
 
+/// IR optimization settings.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct OptimizationSettings {
+    /// Enable constant propagation.
     pub constant_propagation: bool,
+    /// Enable instruction combining.
     pub instruction_combine: bool,
+    /// Enable dead code elimination.
     pub dead_code_elim: bool,
+    /// Enable pruning of unused block parameters.
     pub prune_useless_block_params: bool,
+    /// Number of optimization iterations to run.
     pub iterations: u32,
 }
 
+/// Assembler-level codegen settings.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AssemblerSettings {
+    /// Whether to shuffle basic blocks.
     pub shuffle_basic_blocks: bool,
+    /// Instruction prefix to prepend to emitted instructions.
     pub instruction_prefix: String,
+    /// Chance of randomly applying the prefix.
     pub random_prefix_chance: f64,
 }
 
+/// Compiler configuration (IR + codegen) for a profile.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CDCompilerSettings {
+    /// Assembler settings.
     pub assembler_settings: AssemblerSettings,
+    /// Optimization settings.
     pub optimization_settings: OptimizationSettings,
+    /// IR lifter settings.
     pub lifter_settings: LifterSettings,
 }
 
+/// Fake PDB string settings to confuse debuggers.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FakePdbString {
+    /// Whether the fake PDB string is enabled.
     pub enabled: bool,
+    /// Value to emit as the fake PDB string.
     pub value: String,
 }
 
+/// Custom `.text` section name override.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CustomSectionName {
+    /// Whether this feature is enabled.
     pub enabled: bool,
+    /// Custom section name value.
     pub value: String,
 }
 
+/// Global obfuscation settings for the module.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CDModuleSettings {
+    /// Whether to crash the IDA decompiler intentionally.
     pub ida_crasher: bool,
+    /// Whether to enable IAT/Import protection.
     pub import_protection: bool,
+    /// Fake PDB string settings.
     pub fake_pdb_string: FakePdbString,
+    /// Custom PE section name settings.
     pub custom_section_name: CustomSectionName,
 }
 
+/// Instruction-level semantics used in transformations.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Semantics {
     pub add: bool,
@@ -77,6 +121,7 @@ pub struct Semantics {
     pub neg: bool,
 }
 
+/// Bit widths to apply transformations to.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BitWidths {
     pub bit8: bool,
@@ -85,14 +130,20 @@ pub struct BitWidths {
     pub bit64: bool,
 }
 
+/// Configuration for the Loop Encode Semantics pass.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LoopEncodeSemantics {
+    /// Number of times to attempt transformation.
     pub iterations: u32,
+    /// Percent chance to apply transformation (0–100).
     pub probability: u32,
+    /// Instruction semantics to consider.
     pub semantics: Semantics,
+    /// Bit widths to target.
     pub bitwidths: BitWidths,
 }
 
+/// Configuration for Mixed Boolean Arithmetic pass.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MixedBooleanArithmetic {
     pub iterations: u32,
@@ -101,6 +152,7 @@ pub struct MixedBooleanArithmetic {
     pub bitwidths: BitWidths,
 }
 
+/// Configuration for Mutation Engine pass.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MutationEngine {
     pub iterations: u32,
@@ -110,19 +162,23 @@ pub struct MutationEngine {
     pub bitwidths: BitWidths,
 }
 
-/// Unit‑struct passes
+/// Pass that crashes IDA’s decompiler.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IDADecompilerCrasher;
 
+/// Constant obfuscation pass.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ObscureConstants;
 
+/// Memory reference obfuscation pass.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ObscureReferences;
 
+/// Control-flow obfuscation pass.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ObscureControlFlow;
 
+/// All possible obfuscation passes.
 #[derive(Debug, Serialize, Deserialize)]
 pub enum ObfuscationPass {
     LoopEncodeSemantics(LoopEncodeSemantics),
@@ -134,103 +190,109 @@ pub enum ObfuscationPass {
     ObscureControlFlow(ObscureControlFlow),
 }
 
+/// Profile definition used to apply passes to symbols.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CDProfile {
+    /// Name of the profile.
     pub name: String,
-    pub passes: Vec<ObfuscationPass>,
-    pub compiler_settings: CDCompilerSettings,
-    pub symbols: Vec<u64>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct CDConfig {
-    pub module_settings: CDModuleSettings,
-    pub profiles: Vec<CDProfile>,
-}
-
-/// High level function information
-#[derive(serde::Deserialize, serde::Serialize, Clone)]
-pub struct AnalysisFunction {
-    /// Rva of the function
-    pub rva: u64,
-    /// Name of the function
-    pub symbol: String,
-    /// However many times this function is referenced
-    pub ref_count: usize,
-}
-
-/// Reject string stuff for saas
-#[derive(serde::Deserialize, serde::Serialize, Clone)]
-pub struct AnalysisReject {
-    /// Address of rejected function
-    pub rva: u64,
-    /// Name of rejected function
-    pub symbol: String,
-    /// MlnFunctionRejectReason mnemonic
-    pub ty: String,
-    /// .to_string()'ed MlnFunctionRejectReason
-    pub reason: String,
-}
-
-/// Small wrapper container for source level macros. name contains the profile name
-/// and rvas for that profile.
-#[derive(serde::Deserialize, serde::Serialize, Clone)]
-pub struct AnalysisMacroProfile {
-    /// Profile name
-    pub name: String,
-    /// List of rvas to be associated with the profile
-    pub rvas: Vec<u64>,
-}
-
-/// This structure gets sent to the browser as json.
-#[derive(serde::Deserialize, serde::Serialize, Clone)]
-pub struct AnalysisResult {
-    /// (UserMode/Kernel/UEFI)
-    pub environment: PeEnvironment,
-    /// Function name (or hex of the rva) --> rva of the function.
-    pub functions: Vec<AnalysisFunction>,
-    /// All of the rejected functions and why they were rejected.
-    pub rejects: Vec<AnalysisReject>,
-    /// If someone is using source macros, this will contain
-    /// the profiles and functions to put into that profile. Empty
-    /// if no source macros are used.
-    pub macros: Vec<AnalysisMacroProfile>,
-}
-
-/// Abstraction for symbols to specify them via name or RVA.
-#[derive(Debug, Serialize, Deserialize)]
-pub enum YamlSymbol {
-    /// Name of a symbol
-    Name(String),
-    /// RVA of a symbol
-    Rva(u64),
-}
-
-/// High level profile abstraction
-#[derive(Debug, Serialize, Deserialize)]
-pub struct YamlProfile {
-    /// Name of the profile, this is also used by the source macros to specify which profile to obfuscate the function with!
-    pub name: String,
-    /// Passes to run on the symbols contained inside of this profile
+    /// Obfuscation passes for this profile.
     pub passes: Vec<ObfuscationPass>,
     /// Compiler settings for this profile.
     pub compiler_settings: CDCompilerSettings,
-    /// Symbols contained inside of this profile
+    /// List of symbol RVAs this profile targets.
+    pub symbols: Vec<u64>,
+}
+
+/// Top-level config file structure.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CDConfig {
+    /// Module-wide settings.
+    pub module_settings: CDModuleSettings,
+    /// All profiles to apply during obfuscation.
+    pub profiles: Vec<CDProfile>,
+}
+
+/// Information about a single function found during analysis.
+#[derive(Deserialize, Serialize, Clone)]
+pub struct AnalysisFunction {
+    /// RVA of the function.
+    pub rva: u64,
+    /// Function name.
+    pub symbol: String,
+    /// Number of references to this function.
+    pub ref_count: usize,
+}
+
+/// Reason why a function was rejected from analysis.
+#[derive(Deserialize, Serialize, Clone)]
+pub struct AnalysisReject {
+    /// RVA of the rejected function.
+    pub rva: u64,
+    /// Symbol name.
+    pub symbol: String,
+    /// Mnemonic reason string (e.g., internal enum).
+    pub ty: String,
+    /// Stringified reason (human-readable).
+    pub reason: String,
+}
+
+/// Grouping of functions under a named macro profile.
+#[derive(Deserialize, Serialize, Clone)]
+pub struct AnalysisMacroProfile {
+    /// Name of the macro profile.
+    pub name: String,
+    /// List of function RVAs in this macro.
+    pub rvas: Vec<u64>,
+}
+
+/// Results from binary analysis, returned to the frontend.
+#[derive(Deserialize, Serialize, Clone)]
+pub struct AnalysisResult {
+    /// Environment type (UserMode, KernelMode, UEFI).
+    pub environment: PeEnvironment,
+    /// Functions found during analysis.
+    pub functions: Vec<AnalysisFunction>,
+    /// Rejected functions and reasons.
+    pub rejects: Vec<AnalysisReject>,
+    /// Macro profiles generated from analysis.
+    pub macros: Vec<AnalysisMacroProfile>,
+}
+
+/// Symbol representation used in YAML: either name or RVA.
+#[derive(Debug, Serialize, Deserialize)]
+pub enum YamlSymbol {
+    /// Symbol name.
+    Name(String),
+    /// Symbol RVA.
+    Rva(u64),
+}
+
+/// Obfuscation profile for YAML configuration.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct YamlProfile {
+    /// Profile name (referenced by source macros).
+    pub name: String,
+    /// Passes to apply to this profile.
+    pub passes: Vec<ObfuscationPass>,
+    /// Compiler configuration for this profile.
+    pub compiler_settings: CDCompilerSettings,
+    /// Symbols targeted by this profile.
     pub symbols: Vec<YamlSymbol>,
 }
 
+/// Root YAML config structure.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct YamlConfig {
-    /// Version of this CodeDefender CLI file
+    /// Version of the config file format.
     pub version: String,
-    /// API generated on the website
+    /// API key provided by the CodeDefender web service.
     pub api_key: String,
-    /// Input file for processing (exe, dll, sys)
+    /// Input binary to process.
     pub input_file: PathBuf,
-    /// Input PDB file for processing (optional)
+    /// Optional debug symbol (PDB) file.
     pub pdb_file: Option<PathBuf>,
-    /// Module wide obfuscation settings
+    /// Global module-wide obfuscation settings.
     pub module_settings: CDModuleSettings,
-    /// All of the profiles used for obfuscation
+    /// Obfuscation profiles to apply.
     pub profiles: Vec<CDProfile>,
 }
