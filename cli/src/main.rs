@@ -7,7 +7,7 @@ mod api {
     pub use codedefender_api::upload_file as upload;
 }
 
-const CLI_DOWNLOAD_LINK: &str = "https://github.com/codedefender-io/cli/releases";
+const CLI_DOWNLOAD_LINK: &str = "https://github.com/codedefender-io/api/releases";
 
 #[derive(Parser)]
 #[command(name = "codedefender-cli")]
@@ -62,7 +62,7 @@ fn main() -> Result<(), Error> {
 
     match api::analyze(binary_file_uuid, pdb_file_uuid, &client, &config.api_key) {
         Ok(analysis) => {
-            
+
         }
         Err(e) => {
             panic!("Analysis failed: {}", e.to_string());
