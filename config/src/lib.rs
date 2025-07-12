@@ -180,6 +180,7 @@ pub struct ObscureControlFlow;
 
 /// All possible obfuscation passes.
 #[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(tag = "type")]
 pub enum ObfuscationPass {
     LoopEncodeSemantics(LoopEncodeSemantics),
     MixedBooleanArithmetic(MixedBooleanArithmetic),
