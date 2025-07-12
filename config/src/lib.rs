@@ -278,6 +278,8 @@ pub struct YamlProfile {
     pub compiler_settings: CDCompilerSettings,
     /// Symbols targeted by this profile.
     pub symbols: Vec<YamlSymbol>,
+    /// Only used by the SaaS UI. Not used by the CLI.
+    pub color: String,
 }
 
 /// Root YAML config structure.
