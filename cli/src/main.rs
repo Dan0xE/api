@@ -106,11 +106,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::blocking::Client::new();
     let binary_file_bytes = fs::read(&config.input_file)?;
     let binary_file_uuid = api::upload(binary_file_bytes, &client, &config.api_key)?;
-    
+
     let pdb_file_uuid = match &config.pdb_file {
         Some(path) => Some(api::upload(fs::read(path)?, &client, &config.api_key)?),
         None => None,
     };
+
+    log::info!("Uploaded file(s)...");
+    log::info!("Analyzing program...");
 
     let analysis = api::analyze(
         binary_file_uuid.clone(),
@@ -118,7 +121,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &client,
         &config.api_key,
     )?;
-
+    log::info!("Analysis finished...");
+    log::info!("Constructing config...");
     let mut cdconfig = CDConfig {
         module_settings: config.module_settings,
         profiles: vec![],
@@ -159,6 +163,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
+    log::info!("Obfuscating program...");
     let execution_id = api::defend(binary_file_uuid, cdconfig, &client, &config.api_key)?;
     let start_time = Instant::now();
     let timeout_duration = Duration::from_secs(300); // 5 min
@@ -175,7 +180,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 log::info!("Obfuscated binary written to {:?}", config.output_file);
                 return Ok(());
             }
-            DownloadStatus::Processing => {}
+            DownloadStatus::Processing => {
+                log::debug!("Still Obfuscating...");
+            }
             DownloadStatus::Failed(e) => {
                 log::error!("Obfuscation failed: {}", e);
                 return Ok(());

@@ -184,10 +184,10 @@ pub enum ObfuscationPass {
     LoopEncodeSemantics(LoopEncodeSemantics),
     MixedBooleanArithmetic(MixedBooleanArithmetic),
     MutationEngine(MutationEngine),
-    IDADecompilerCrasher(IDADecompilerCrasher),
-    ObscureConstants(ObscureConstants),
-    ObscureReferences(ObscureReferences),
-    ObscureControlFlow(ObscureControlFlow),
+    IDADecompilerCrasher,
+    ObscureConstants,
+    ObscureReferences,
+    ObscureControlFlow,
 }
 
 /// Profile definition used to apply passes to symbols.
@@ -279,7 +279,7 @@ pub struct YamlProfile {
     /// Symbols targeted by this profile.
     pub symbols: Vec<YamlSymbol>,
     /// Only used by the SaaS UI. Not used by the CLI.
-    pub color: String,
+    pub color: Option<String>,
 }
 
 /// Root YAML config structure.

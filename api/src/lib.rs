@@ -10,10 +10,10 @@ use codedefender_config::{AnalysisResult, CDConfig};
 use reqwest::{blocking::Client, StatusCode};
 use std::collections::HashMap;
 
-const UPLOAD_EP: &str = "https://app.codedefender.io/api/upload";
-const ANALYZE_EP: &str = "https://app.codedefender.io/api/analyze";
-const DEFEND_EP: &str = "https://app.codedefender.io/api/defend";
-const DOWNLOAD_EP: &str = "https://app.codedefender.io/api/download";
+const UPLOAD_EP: &str = "http://localhost:5173/api/upload";
+const ANALYZE_EP: &str = "http://localhost:5173/api/analyze";
+const DEFEND_EP: &str = "http://localhost:5173/api/defend";
+const DOWNLOAD_EP: &str = "http://localhost:5173/api/download";
 
 /// Represents the result of a call to [`download`].
 pub enum DownloadStatus {
@@ -50,6 +50,7 @@ pub fn upload_file(
     let response = client
         .put(UPLOAD_EP)
         .header("Authorization", format!("ApiKey {}", api_key))
+        .header("Content-Type", "application/octet-stream")
         .body(file_bytes)
         .send()?
         .error_for_status()?;
@@ -123,13 +124,13 @@ pub fn defend(
     api_key: &str,
 ) -> Result<String, reqwest::Error> {
     let body = serde_json::to_string(&config).expect("Failed to serialize CDConfig");
-
     let mut query_params = HashMap::new();
     query_params.insert("fileId", uuid);
 
     let response = client
         .post(DEFEND_EP)
         .header("Authorization", format!("ApiKey {}", api_key))
+        .header("Content-Type", "application/json")
         .query(&query_params)
         .body(body)
         .send()?
