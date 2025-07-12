@@ -11,7 +11,7 @@ use std::path::PathBuf;
 pub const YAML_CONFIG_VERSION: &str = "1.0.0";
 
 /// Available SIMD extension types used by mutation engines.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum MutationEngineExtension {
     /// Generic (no special SIMD usage)
     Generic = 0,
@@ -31,7 +31,7 @@ pub enum PeEnvironment {
 }
 
 /// Configuration settings for lifting x86 instructions into IR.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LifterSettings {
     /// Whether to lift calls into IR.
     pub lift_calls: bool,
@@ -42,7 +42,7 @@ pub struct LifterSettings {
 }
 
 /// IR optimization settings.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct OptimizationSettings {
     /// Enable constant propagation.
     pub constant_propagation: bool,
@@ -57,7 +57,7 @@ pub struct OptimizationSettings {
 }
 
 /// Assembler-level codegen settings.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct AssemblerSettings {
     /// Whether to shuffle basic blocks.
     pub shuffle_basic_blocks: bool,
@@ -68,7 +68,7 @@ pub struct AssemblerSettings {
 }
 
 /// Compiler configuration (IR + codegen) for a profile.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CDCompilerSettings {
     /// Assembler settings.
     pub assembler_settings: AssemblerSettings,
@@ -110,7 +110,7 @@ pub struct CDModuleSettings {
 }
 
 /// Instruction-level semantics used in transformations.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Semantics {
     pub add: bool,
     pub sub: bool,
@@ -122,7 +122,7 @@ pub struct Semantics {
 }
 
 /// Bit widths to apply transformations to.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct BitWidths {
     pub bit8: bool,
     pub bit16: bool,
@@ -131,7 +131,7 @@ pub struct BitWidths {
 }
 
 /// Configuration for the Loop Encode Semantics pass.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LoopEncodeSemantics {
     /// Number of times to attempt transformation.
     pub iterations: u32,
@@ -144,7 +144,7 @@ pub struct LoopEncodeSemantics {
 }
 
 /// Configuration for Mixed Boolean Arithmetic pass.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MixedBooleanArithmetic {
     pub iterations: u32,
     pub probability: u32,
@@ -153,7 +153,7 @@ pub struct MixedBooleanArithmetic {
 }
 
 /// Configuration for Mutation Engine pass.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct MutationEngine {
     pub iterations: u32,
     pub probability: u32,
@@ -163,23 +163,23 @@ pub struct MutationEngine {
 }
 
 /// Pass that crashes IDA’s decompiler.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct IDADecompilerCrasher;
 
 /// Constant obfuscation pass.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ObscureConstants;
 
 /// Memory reference obfuscation pass.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ObscureReferences;
 
 /// Control-flow obfuscation pass.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ObscureControlFlow;
 
 /// All possible obfuscation passes.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum ObfuscationPass {
     LoopEncodeSemantics(LoopEncodeSemantics),
     MixedBooleanArithmetic(MixedBooleanArithmetic),
@@ -213,7 +213,7 @@ pub struct CDConfig {
 }
 
 /// Information about a single function found during analysis.
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct AnalysisFunction {
     /// RVA of the function.
     pub rva: u64,
@@ -224,7 +224,7 @@ pub struct AnalysisFunction {
 }
 
 /// Reason why a function was rejected from analysis.
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct AnalysisReject {
     /// RVA of the rejected function.
     pub rva: u64,
@@ -237,7 +237,7 @@ pub struct AnalysisReject {
 }
 
 /// Grouping of functions under a named macro profile.
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct AnalysisMacroProfile {
     /// Name of the macro profile.
     pub name: String,
@@ -246,7 +246,7 @@ pub struct AnalysisMacroProfile {
 }
 
 /// Results from binary analysis, returned to the frontend.
-#[derive(Deserialize, Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct AnalysisResult {
     /// Environment type (UserMode, KernelMode, UEFI).
     pub environment: PeEnvironment,
@@ -287,8 +287,13 @@ pub struct YamlConfig {
     pub version: String,
     /// API key provided by the CodeDefender web service.
     pub api_key: String,
+    /// Poll timeout for downloading the obfuscated program.
+    /// Do not go below 500(ms) otherwise you will be timed out.
+    pub timeout: u64,
     /// Input binary to process.
     pub input_file: PathBuf,
+    /// Output path for the obfuscated binary.
+    pub output_file: PathBuf,
     /// Optional debug symbol (PDB) file.
     pub pdb_file: Option<PathBuf>,
     /// Global module-wide obfuscation settings.

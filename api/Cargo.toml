@@ -2,6 +2,14 @@
 name = "codedefender-api"
 version = "0.1.0"
 edition = "2024"
+description = "Blocking client library for the CodeDefender binary obfuscation API."
+license = "Apache-2.0"
+repository = "https://github.com/backengineering/codedefender-api"
+documentation = "https://docs.rs/codedefender-api"
+readme = "README.md"
+keywords = ["obfuscation", "binary", "security", "api", "client"]
+categories = ["api-bindings", "network-programming", "command-line-utilities"]
+homepage = "https://codedefender.io"
 
 [dependencies]
 codedefender-config = { path = "../config" }
