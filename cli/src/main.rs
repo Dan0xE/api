@@ -106,7 +106,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = reqwest::blocking::Client::new();
     let binary_file_bytes = fs::read(&config.input_file)?;
     let binary_file_uuid = api::upload(binary_file_bytes, &client, &config.api_key)?;
-
+    
     let pdb_file_uuid = match &config.pdb_file {
         Some(path) => Some(api::upload(fs::read(path)?, &client, &config.api_key)?),
         None => None,
