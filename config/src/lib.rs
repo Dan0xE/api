@@ -5,7 +5,6 @@
 //! This crate is intended to be consumed by tools that integrate with or generate CodeDefender config files.
 
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 
 /// Current supported YAML config version.
 pub const YAML_CONFIG_VERSION: &str = "1.0.0";
@@ -14,9 +13,9 @@ pub const YAML_CONFIG_VERSION: &str = "1.0.0";
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum MutationEngineExtension {
     /// Generic (no special SIMD usage)
-    Generic = 0,
+    Generic,
     /// SSE-enabled
-    SSE = 1,
+    SSE,
 }
 
 /// Supported PE environments.
@@ -288,17 +287,6 @@ pub struct YamlProfile {
 pub struct YamlConfig {
     /// Version of the config file format.
     pub version: String,
-    /// API key provided by the CodeDefender web service.
-    pub api_key: String,
-    /// Poll timeout for downloading the obfuscated program.
-    /// Do not go below 500(ms) otherwise you will be timed out.
-    pub timeout: u64,
-    /// Input binary to process.
-    pub input_file: PathBuf,
-    /// Output path for the obfuscated binary.
-    pub output_file: PathBuf,
-    /// Optional debug symbol (PDB) file.
-    pub pdb_file: Option<PathBuf>,
     /// Global module-wide obfuscation settings.
     pub module_settings: CDModuleSettings,
     /// Obfuscation profiles to apply.

@@ -10,10 +10,10 @@ use codedefender_config::{AnalysisResult, CDConfig};
 use reqwest::{blocking::Client, StatusCode};
 use std::collections::HashMap;
 
-const UPLOAD_EP: &str = "http://localhost:5173/api/upload";
-const ANALYZE_EP: &str = "http://localhost:5173/api/analyze";
-const DEFEND_EP: &str = "http://localhost:5173/api/defend";
-const DOWNLOAD_EP: &str = "http://localhost:5173/api/download";
+const UPLOAD_EP: &str = "https://app.codedefender.io/api/upload";
+const ANALYZE_EP: &str = "https://app.codedefender.io/api/analyze";
+const DEFEND_EP: &str = "https://app.codedefender.io/api/defend";
+const DOWNLOAD_EP: &str = "https://app.codedefender.io/api/download";
 
 /// Represents the result of a call to [`download`].
 pub enum DownloadStatus {

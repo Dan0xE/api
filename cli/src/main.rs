@@ -18,17 +18,39 @@ mod api {
 
 const CLI_DOWNLOAD_LINK: &str = "https://github.com/codedefender-io/api/releases";
 
-#[derive(Parser)]
+/// Commandline interface for CodeDefender
+#[derive(Parser, Debug)]
 #[command(name = "codedefender-cli")]
 #[command(about = "Commandline interface for CodeDefender", long_about = None)]
-struct Cli {
+pub struct Cli {
     /// Path to the YAML configuration file
     #[arg(short, long, value_name = "FILE")]
-    config: PathBuf,
+    pub config: PathBuf,
 
     /// Log level (error, warn, info, debug, trace)
     #[arg(long, value_enum, default_value = "info")]
-    log_level: log::LevelFilter,
+    pub log_level: log::LevelFilter,
+
+    /// API key provided by the CodeDefender web service. You can either pass it on the commandline or assign it to "CD_API_KEY" env variable.
+    #[arg(long, env = "CD_API_KEY")]
+    pub api_key: String,
+
+    /// Poll timeout for downloading the obfuscated program (in milliseconds)
+    /// Do not go below 500 otherwise you will be timed out.
+    #[arg(long, default_value_t = 500)]
+    pub timeout: u64,
+
+    /// Input binary to process
+    #[arg(long, value_name = "INPUT")]
+    pub input_file: PathBuf,
+
+    /// Optional debug symbol (PDB) file
+    #[arg(long, value_name = "PDB")]
+    pub pdb_file: Option<PathBuf>,
+
+    /// Output path for the Zip file containing the obfuscated binary and dbg file
+    #[arg(long, value_name = "OUTPUT")]
+    pub output: PathBuf,
 }
 
 // Resolve symbol names to RVA's. If a symbol is specified via RVA
@@ -104,11 +126,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     let client = reqwest::blocking::Client::new();
-    let binary_file_bytes = fs::read(&config.input_file)?;
-    let binary_file_uuid = api::upload(binary_file_bytes, &client, &config.api_key)?;
+    let binary_file_bytes = fs::read(&cli.input_file)?;
+    let binary_file_uuid = api::upload(binary_file_bytes, &client, &cli.api_key)?;
 
-    let pdb_file_uuid = match &config.pdb_file {
-        Some(path) => Some(api::upload(fs::read(path)?, &client, &config.api_key)?),
+    let pdb_file_uuid = match &cli.pdb_file {
+        Some(path) => Some(api::upload(fs::read(path)?, &client, &cli.api_key)?),
         None => None,
     };
 
@@ -119,10 +141,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         binary_file_uuid.clone(),
         pdb_file_uuid,
         &client,
-        &config.api_key,
+        &cli.api_key,
     )?;
+
     log::info!("Analysis finished...");
     log::info!("Constructing config...");
+
     let mut cdconfig = CDConfig {
         module_settings: config.module_settings,
         profiles: vec![],
@@ -164,7 +188,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     log::info!("Obfuscating program...");
-    let execution_id = api::defend(binary_file_uuid, cdconfig, &client, &config.api_key)?;
+    let execution_id = api::defend(binary_file_uuid, cdconfig, &client, &cli.api_key)?;
     let start_time = Instant::now();
     let timeout_duration = Duration::from_secs(300); // 5 min
 
@@ -174,14 +198,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             return Ok(());
         }
 
-        match api::download(execution_id.clone(), &client, &config.api_key) {
+        match api::download(execution_id.clone(), &client, &cli.api_key) {
             DownloadStatus::Ready(bytes) => {
-                fs::write(&config.output_file, bytes)?;
-                log::info!("Obfuscated binary written to {:?}", config.output_file);
+                fs::write(&cli.output, bytes)?;
+                log::info!("Obfuscated binary written to {:?}", cli.output);
                 return Ok(());
             }
             DownloadStatus::Processing => {
-                log::debug!("Still Obfuscating...");
+                log::info!("Still Obfuscating...");
             }
             DownloadStatus::Failed(e) => {
                 log::error!("Obfuscation failed: {}", e);
@@ -189,6 +213,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
-        std::thread::sleep(Duration::from_millis(config.timeout));
+        std::thread::sleep(Duration::from_millis(cli.timeout));
     }
 }
