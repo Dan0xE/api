@@ -34,6 +34,8 @@ pub enum PeEnvironment {
 pub struct LifterSettings {
     /// Whether to lift calls into IR.
     pub lift_calls: bool,
+    /// Calling convention used for lifting, only `WindowsAbi`, and `Conservative` are supported.
+    pub calling_convention: String,
     /// Max stack copy size in bytes when lifting.
     pub max_stack_copy_size: u32,
     /// Fallback: split on calls if lifting fails.
