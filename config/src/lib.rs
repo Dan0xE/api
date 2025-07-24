@@ -102,6 +102,11 @@ pub struct CDModuleSettings {
     pub ida_crasher: bool,
     /// Whether to enable IAT/Import protection.
     pub import_protection: bool,
+    /// Obscure the entry point of the module with anti tamper and anti debug tactics
+    pub obscure_entry_point: bool,
+    /// Clear unwind information. makes it harder for attackers to locate functions, however
+    /// structured exception handling will not work.
+    pub clear_unwind_info: bool,
     /// Fake PDB string settings.
     pub fake_pdb_string: FakePdbString,
     /// Custom PE section name settings.
