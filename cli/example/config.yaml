@@ -1,0 +1,36 @@
+version: "1.0.1"
+module_settings:
+  ida_crasher: false
+  import_protection: false
+  obscure_entry_point: false
+  clear_unwind_info: false
+  fake_pdb_string:
+    enabled: false
+    value: ""
+  custom_section_name:
+    enabled: false
+    value: ""
+profiles:
+  - name: "Profile1"
+    passes:
+      - type: ObscureReferences
+      - type: ObscureConstants
+    compiler_settings:
+      assembler_settings:
+        shuffle_basic_blocks: true
+        instruction_prefix: ""
+        random_prefix_chance: 0
+      optimization_settings:
+        constant_propagation: true
+        instruction_combine: true
+        dead_code_elim: true
+        prune_useless_block_params: true
+        iterations: 0
+      lifter_settings:
+        lift_calls: true
+        calling_convention: 'WindowsAbi'
+        max_stack_copy_size: 1024
+        split_on_calls_fallback: true
+    symbols:
+      - !Name "main" # Specify via name
+      - !Rva 0x1010  # Specify via RVA

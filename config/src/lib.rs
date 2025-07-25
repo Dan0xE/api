@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Current supported YAML config version.
-pub const YAML_CONFIG_VERSION: &str = "1.0.0";
+pub const YAML_CONFIG_VERSION: &str = "1.0.1";
 
 /// Available SIMD extension types used by mutation engines.
 #[derive(Debug, Serialize, Deserialize, Clone)]
