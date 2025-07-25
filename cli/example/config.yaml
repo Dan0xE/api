@@ -13,8 +13,27 @@ module_settings:
 profiles:
   - name: "Profile1"
     passes:
+      - type: ObscureControlFlow
       - type: ObscureReferences
       - type: ObscureConstants
+      # Loop encode semantics & Mutation Engine look about the same
+      - type: MutationEngine
+        iterations: 1
+        probability: 1
+        extension: SSE
+        semantics:
+          add: true
+          sub: true
+          and: true
+          xor: true
+          or: true
+          not: true
+          neg: true
+        bitwidths:
+          bit8: true
+          bit16: true
+          bit32: true
+          bit64: true
     compiler_settings:
       assembler_settings:
         shuffle_basic_blocks: true

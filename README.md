@@ -17,4 +17,6 @@ A blocking Rust client library for interacting with the CodeDefender SaaS backen
 ### `cli/` → `codedefender-cli`  
 A command-line tool built on top of `codedefender-api`, offering an easy way to run protection workflows locally from the terminal.
 
+[Checkout the example here](cli/example/)
+
 ---
