@@ -144,6 +144,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &cli.api_key,
     )?;
 
+    log::debug!("Analysis info: {:#X?}", analysis);
     log::info!("Analysis finished...");
     log::info!("Constructing config...");
 
