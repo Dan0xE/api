@@ -80,7 +80,7 @@ pub struct CDCompilerSettings {
 }
 
 /// Fake PDB string settings to confuse debuggers.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct FakePdbString {
     /// Whether the fake PDB string is enabled.
     pub enabled: bool,
@@ -89,7 +89,7 @@ pub struct FakePdbString {
 }
 
 /// Custom `.text` section name override.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Serialize, Deserialize)]
 pub struct CustomSectionName {
     /// Whether this feature is enabled.
     pub enabled: bool,
@@ -101,38 +101,55 @@ pub struct CustomSectionName {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CDModuleSettings {
     /// Whether to crash the IDA decompiler intentionally.
+    #[serde(default)]
     pub ida_crasher: bool,
     /// Whether to enable IAT/Import protection.
+    #[serde(default)]
     pub import_protection: bool,
     /// Obscure the entry point of the module with anti tamper and anti debug tactics
+    #[serde(default)]
     pub obscure_entry_point: bool,
     /// Clear unwind information. makes it harder for attackers to locate functions, however
     /// structured exception handling will not work.
+    #[serde(default)]
     pub clear_unwind_info: bool,
     /// Fake PDB string settings.
+    #[serde(default)]
     pub fake_pdb_string: FakePdbString,
     /// Custom PE section name settings.
+    #[serde(default)]
     pub custom_section_name: CustomSectionName,
 }
 
 /// Instruction-level semantics used in transformations.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Semantics {
+    #[serde(default)]
     pub add: bool,
+    #[serde(default)]
     pub sub: bool,
+    #[serde(default)]
     pub and: bool,
+    #[serde(default)]
     pub xor: bool,
+    #[serde(default)]
     pub or: bool,
+    #[serde(default)]
     pub not: bool,
+    #[serde(default)]
     pub neg: bool,
 }
 
 /// Bit widths to apply transformations to.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct BitWidths {
+    #[serde(default)]
     pub bit8: bool,
+    #[serde(default)]
     pub bit16: bool,
+    #[serde(default)]
     pub bit32: bool,
+    #[serde(default)]
     pub bit64: bool,
 }
 
