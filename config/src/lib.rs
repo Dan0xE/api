@@ -201,6 +201,21 @@ pub struct ObscureReferences;
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ObscureControlFlow;
 
+/// Tether extraction pass.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct TetherExtraction {
+    /// Min length of a sequence of instructions that should be extracted.
+    /// Its a bad idea for this to be 1 usually because its easy to synthesize
+    pub min_extract_len: usize,
+    /// Tether server endpoint
+    pub endpoint: String,
+    /// Tether server port
+    pub port: u16,
+    /// Hex string of the servers public key. This is used for public key pinning.
+    /// This needs to be length 64...
+    pub server_public_key: String,
+}
+
 /// All possible obfuscation passes.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type")]
@@ -208,6 +223,7 @@ pub enum ObfuscationPass {
     LoopEncodeSemantics(LoopEncodeSemantics),
     MixedBooleanArithmetic(MixedBooleanArithmetic),
     MutationEngine(MutationEngine),
+    TetherExtraction(TetherExtraction),
     IDADecompilerCrasher,
     ObscureConstants,
     ObscureReferences,
