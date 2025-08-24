@@ -229,7 +229,7 @@ pub enum ObfuscationPass {
     IDADecompilerCrasher,
     ObscureConstants,
     ObscureReferences,
-    ObscureControlFlow,
+    ObscureControlFlow(ObscureControlFlow),
 }
 
 /// Profile definition used to apply passes to symbols.
