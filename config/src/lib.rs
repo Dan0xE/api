@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Current supported YAML config version.
-pub const YAML_CONFIG_VERSION: &str = "1.0.1";
+pub const YAML_CONFIG_VERSION: &str = "1.0.2";
 
 /// Available SIMD extension types used by mutation engines.
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -199,7 +199,9 @@ pub struct ObscureReferences;
 
 /// Control-flow obfuscation pass.
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ObscureControlFlow;
+pub struct ObscureControlFlow {
+    pub probability: u32,
+}
 
 /// Tether extraction pass.
 #[derive(Debug, Serialize, Deserialize, Clone)]
