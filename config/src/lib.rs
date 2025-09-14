@@ -7,7 +7,7 @@
 use serde::{Deserialize, Serialize};
 
 /// Current supported YAML config version.
-pub const YAML_CONFIG_VERSION: &str = "1.0.2";
+pub const YAML_CONFIG_VERSION: &str = "1.0.3";
 
 /// Available SIMD extension types used by mutation engines.
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -218,6 +218,15 @@ pub struct TetherExtraction {
     pub server_public_key: String,
 }
 
+/// Opaque block duplication pass.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct OpaqueBlockDuplication {
+    /// Number of iterations to attempt transformation.
+    pub iterations: u32,
+    /// Percent chance to apply transformation (0–100).
+    pub probability: u32,
+}
+
 /// All possible obfuscation passes.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type")]
@@ -229,6 +238,8 @@ pub enum ObfuscationPass {
     IDADecompilerCrasher,
     ObscureConstants,
     ObscureReferences,
+    AntiEmulator,
+    OpaqueBlockDuplication(OpaqueBlockDuplication),
     ObscureControlFlow(ObscureControlFlow),
 }
 

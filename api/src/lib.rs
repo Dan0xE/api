@@ -52,8 +52,7 @@ pub fn upload_file(
         .header("Authorization", format!("ApiKey {}", api_key))
         .header("Content-Type", "application/octet-stream")
         .body(file_bytes)
-        .send()?
-        .error_for_status()?;
+        .send()?;
 
     response.text()
 }
