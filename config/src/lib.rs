@@ -227,6 +227,13 @@ pub struct OpaqueBlockDuplication {
     pub probability: u32,
 }
 
+/// Split block pass, used to create more control flow points for other passes to transform.
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SplitBlockPass {
+    /// The number of SSA values required to be within a block for it to be split into two seperate blocks.
+    pub threshold: u32,
+}
+
 /// All possible obfuscation passes.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type")]
@@ -235,12 +242,14 @@ pub enum ObfuscationPass {
     MixedBooleanArithmetic(MixedBooleanArithmetic),
     MutationEngine(MutationEngine),
     TetherExtraction(TetherExtraction),
+    SplitBlockPass(SplitBlockPass),
+    OpaqueBlockDuplication(OpaqueBlockDuplication),
+    ObscureControlFlow(ObscureControlFlow),
     IDADecompilerCrasher,
     ObscureConstants,
     ObscureReferences,
     AntiEmulator,
-    OpaqueBlockDuplication(OpaqueBlockDuplication),
-    ObscureControlFlow(ObscureControlFlow),
+    LeaEncodeImm,
 }
 
 /// Profile definition used to apply passes to symbols.
