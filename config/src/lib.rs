@@ -234,6 +234,13 @@ pub struct SplitBlockPass {
     pub threshold: u32,
 }
 
+/// Encode immediate ssa values into lea's
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct LeaEncodeImm {
+    /// Percent chance to apply transformation (0–100).
+    pub probability: u32,
+}
+
 /// All possible obfuscation passes.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type")]
@@ -245,11 +252,11 @@ pub enum ObfuscationPass {
     SplitBlockPass(SplitBlockPass),
     OpaqueBlockDuplication(OpaqueBlockDuplication),
     ObscureControlFlow(ObscureControlFlow),
+    LeaEncodeImm(LeaEncodeImm),
     IDADecompilerCrasher,
     ObscureConstants,
     ObscureReferences,
     AntiEmulator,
-    LeaEncodeImm,
 }
 
 /// Profile definition used to apply passes to symbols.
