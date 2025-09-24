@@ -189,9 +189,18 @@ pub struct MutationEngine {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct IDADecompilerCrasher;
 
-/// Constant obfuscation pass.
+/// Suppress constants and prevent them from rematerializing at runtime.
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ObscureConstants;
+pub struct SuppressConstants;
+
+/// Statically obscure constants, this does not prevent rematerialization at runtime.
+/// Use the SuppressConstants pass in tandem with this!
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct ObscureConstants {
+    pub probability: u32,
+    pub iterations: u32,
+    pub bitwidths: BitWidths,
+}
 
 /// Memory reference obfuscation pass.
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -253,8 +262,9 @@ pub enum ObfuscationPass {
     OpaqueBlockDuplication(OpaqueBlockDuplication),
     ObscureControlFlow(ObscureControlFlow),
     LeaEncodeImm(LeaEncodeImm),
+    ObscureConstants(ObscureConstants),
     IDADecompilerCrasher,
-    ObscureConstants,
+    SuppressConstants,
     ObscureReferences,
     AntiEmulator,
 }
