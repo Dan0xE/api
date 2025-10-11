@@ -159,7 +159,7 @@ pub struct BitWidths {
 /// Please refer to this documentation for more info:
 /// https://docs.codedefender.io/features/ethnicity
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct SsaEthnicity {
+pub struct SsaOrigins {
     pub normal: bool,
     pub memop: bool,
     pub fp_based_memop: bool,
@@ -177,7 +177,7 @@ pub struct LoopEncodeSemantics {
     pub semantics: Semantics,
     /// Bit widths to target.
     pub bitwidths: BitWidths,
-    pub ethnicities: SsaEthnicity,
+    pub ethnicities: SsaOrigins,
 }
 
 /// Configuration for Mixed Boolean Arithmetic pass.
@@ -187,7 +187,7 @@ pub struct MixedBooleanArithmetic {
     pub probability: u32,
     pub semantics: Semantics,
     pub bitwidths: BitWidths,
-    pub ethnicities: SsaEthnicity,
+    pub ethnicities: SsaOrigins,
 }
 
 /// Configuration for Mutation Engine pass.
@@ -198,7 +198,7 @@ pub struct MutationEngine {
     pub extension: MutationEngineExtension,
     pub semantics: Semantics,
     pub bitwidths: BitWidths,
-    pub ethnicities: SsaEthnicity,
+    pub ethnicities: SsaOrigins,
 }
 
 /// Pass that crashes IDA’s decompiler.
@@ -208,7 +208,7 @@ pub struct IDADecompilerCrasher;
 /// Suppress constants and prevent them from rematerializing at runtime.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SuppressConstants {
-    pub ethnicities: SsaEthnicity,
+    pub ethnicities: SsaOrigins,
 }
 
 /// Statically obscure constants, this does not prevent rematerialization at runtime.
@@ -218,7 +218,7 @@ pub struct ObscureConstants {
     pub probability: u32,
     pub iterations: u32,
     pub bitwidths: BitWidths,
-    pub ethnicities: SsaEthnicity,
+    pub ethnicities: SsaOrigins,
 }
 
 /// Memory reference obfuscation pass.
@@ -267,7 +267,7 @@ pub struct SplitBlockPass {
 pub struct LeaEncodeImm {
     /// Percent chance to apply transformation (0–100).
     pub probability: u32,
-    pub ethnicities: SsaEthnicity,
+    pub ethnicities: SsaOrigins,
 }
 
 /// All possible obfuscation passes.
@@ -283,8 +283,8 @@ pub enum ObfuscationPass {
     ObscureControlFlow(ObscureControlFlow),
     LeaEncodeImm(LeaEncodeImm),
     ObscureConstants(ObscureConstants),
+    SuppressConstants(SuppressConstants),
     IDADecompilerCrasher,
-    SuppressConstants,
     ObscureReferences,
     AntiEmulator,
 }
