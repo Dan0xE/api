@@ -16,11 +16,15 @@ profiles:
       - type: ObscureControlFlow
       - type: ObscureReferences
       - type: ObscureConstants
-      # Loop encode semantics & Mutation Engine look about the same
+        ethnicities:
+          normal: true
+          memop: true
+          fp_based_memop: true
+          sp_based_memop: true
       - type: MutationEngine
         iterations: 1
         probability: 1
-        extension: SSE
+        extension: SSE42
         semantics:
           add: true
           sub: true
@@ -34,6 +38,11 @@ profiles:
           bit16: true
           bit32: true
           bit64: true
+        ethnicities:
+          normal: true
+          memop: true
+          fp_based_memop: true
+          sp_based_memop: true
     compiler_settings:
       assembler_settings:
         shuffle_basic_blocks: true

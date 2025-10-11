@@ -7,15 +7,17 @@
 use serde::{Deserialize, Serialize};
 
 /// Current supported YAML config version.
-pub const YAML_CONFIG_VERSION: &str = "1.0.3";
+pub const YAML_CONFIG_VERSION: &str = "1.0.4";
 
 /// Available SIMD extension types used by mutation engines.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub enum MutationEngineExtension {
-    /// Generic (no special SIMD usage)
+    /// All base instructions
     Generic,
-    /// SSE-enabled
-    SSE,
+    /// All base instructions + Legacy SSE instructions up until SSE3
+    SSE3,
+    /// All base instructions + Legacy SSE instructions up until SSE4.2
+    SSE42
 }
 
 /// Supported PE environments.
@@ -153,6 +155,17 @@ pub struct BitWidths {
     pub bit64: bool,
 }
 
+/// The origin of SSA value from within the instruction.
+/// Please refer to this documentation for more info:
+/// https://docs.codedefender.io/features/ethnicity
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SsaEthnicity {
+    pub normal: bool,
+    pub memop: bool,
+    pub fp_based_memop: bool,
+    pub sp_based_memop: bool,
+}
+
 /// Configuration for the Loop Encode Semantics pass.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LoopEncodeSemantics {
@@ -164,6 +177,7 @@ pub struct LoopEncodeSemantics {
     pub semantics: Semantics,
     /// Bit widths to target.
     pub bitwidths: BitWidths,
+    pub ethnicities: SsaEthnicity,
 }
 
 /// Configuration for Mixed Boolean Arithmetic pass.
@@ -173,6 +187,7 @@ pub struct MixedBooleanArithmetic {
     pub probability: u32,
     pub semantics: Semantics,
     pub bitwidths: BitWidths,
+    pub ethnicities: SsaEthnicity,
 }
 
 /// Configuration for Mutation Engine pass.
@@ -183,6 +198,7 @@ pub struct MutationEngine {
     pub extension: MutationEngineExtension,
     pub semantics: Semantics,
     pub bitwidths: BitWidths,
+    pub ethnicities: SsaEthnicity,
 }
 
 /// Pass that crashes IDA’s decompiler.
@@ -191,7 +207,9 @@ pub struct IDADecompilerCrasher;
 
 /// Suppress constants and prevent them from rematerializing at runtime.
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct SuppressConstants;
+pub struct SuppressConstants {
+    pub ethnicities: SsaEthnicity,
+}
 
 /// Statically obscure constants, this does not prevent rematerialization at runtime.
 /// Use the SuppressConstants pass in tandem with this!
@@ -200,6 +218,7 @@ pub struct ObscureConstants {
     pub probability: u32,
     pub iterations: u32,
     pub bitwidths: BitWidths,
+    pub ethnicities: SsaEthnicity,
 }
 
 /// Memory reference obfuscation pass.
@@ -248,6 +267,7 @@ pub struct SplitBlockPass {
 pub struct LeaEncodeImm {
     /// Percent chance to apply transformation (0–100).
     pub probability: u32,
+    pub ethnicities: SsaEthnicity,
 }
 
 /// All possible obfuscation passes.
