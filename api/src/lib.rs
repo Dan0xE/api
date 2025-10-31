@@ -7,7 +7,7 @@
 //! using the `ApiKey` scheme.
 
 use codedefender_config::{AnalysisResult, CDConfig};
-use reqwest::{blocking::Client, StatusCode};
+use reqwest::{StatusCode, blocking::Client};
 use std::collections::HashMap;
 
 const UPLOAD_EP: &str = "https://app.codedefender.io/api/upload";

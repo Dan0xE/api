@@ -17,7 +17,7 @@ pub enum MutationEngineExtension {
     /// All base instructions + Legacy SSE instructions up until SSE3
     SSE3,
     /// All base instructions + Legacy SSE instructions up until SSE4.2
-    SSE42
+    SSE42,
 }
 
 /// Supported PE environments.
@@ -82,7 +82,7 @@ pub struct CDCompilerSettings {
 }
 
 /// Fake PDB string settings to confuse debuggers.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FakePdbString {
     /// Whether the fake PDB string is enabled.
     pub enabled: bool,
@@ -91,7 +91,7 @@ pub struct FakePdbString {
 }
 
 /// Custom `.text` section name override.
-#[derive(Default, Debug, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct CustomSectionName {
     /// Whether this feature is enabled.
     pub enabled: bool,
@@ -100,7 +100,7 @@ pub struct CustomSectionName {
 }
 
 /// Global obfuscation settings for the module.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CDModuleSettings {
     /// Whether to crash the IDA decompiler intentionally.
     #[serde(default)]
@@ -290,7 +290,7 @@ pub enum ObfuscationPass {
 }
 
 /// Profile definition used to apply passes to symbols.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CDProfile {
     /// Name of the profile.
     pub name: String,
@@ -303,7 +303,7 @@ pub struct CDProfile {
 }
 
 /// Top-level config file structure.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CDConfig {
     /// Module-wide settings.
     pub module_settings: CDModuleSettings,

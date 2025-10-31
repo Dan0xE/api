@@ -188,7 +188,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "codedefender-cli"
+name = "codedefender-config"
+version = "0.3.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "codedefender-utils"
 version = "0.1.0"
 dependencies = [
  "clap",
@@ -199,13 +206,6 @@ dependencies = [
  "reqwest",
  "serde",
  "serde_yaml",
-]
-
-[[package]]
-name = "codedefender-config"
-version = "0.3.0"
-dependencies = [
- "serde",
 ]
 
 [[package]]

@@ -14,8 +14,7 @@ Shared data structures and configuration types used by both the CLI and API clie
 ### `api/` → [`codedefender-api`](https://crates.io/crates/codedefender-api)  
 A blocking Rust client library for interacting with the CodeDefender SaaS backend. Upload binaries, perform analysis, trigger obfuscation, and poll for the obfuscated output.
 
-### `cli/` → `codedefender-cli`  
-A command-line tool built on top of `codedefender-api`, offering an easy way to run protection workflows locally from the terminal.
+### `utils/` → `codedefender-utils`  
 
 [Checkout the example here](cli/example/)
 
